@@ -2,12 +2,12 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-# --- A. Setup LLM (Using the recommended, fixed import) ---
+# --- A. Setup LLM  ---
 # NOTE: You MUST run 'pip install -U langchain-ollama' first!
 from langchain_ollama import ChatOllama
 llm = ChatOllama(model="mistral")
 
-# --- B. RAG Setup (FIX for 'retriever' not defined) ---
+# --- B. RAG Setup ---
 
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -16,7 +16,7 @@ from langchain_ollama import OllamaEmbeddings
 
 # 1. Load Data (Replace 'my_document.txt' with your file path)
 # Assuming you have a file to load for RAG
-loader = TextLoader("./my_document.txt") # <-- Change this path!
+loader = TextLoader("./my_document.txt")
 docs = loader.load()
 
 # 2. Split Documents
@@ -25,7 +25,7 @@ splits = text_splitter.split_documents(docs)
 
 # 3. Create Embeddings and Vector Store
 # Use OllamaEmbeddings for consistency and local execution
-embedding_model = OllamaEmbeddings(model="nomic-embed-text") # <-- RECOMMENDED CHANGE
+embedding_model = OllamaEmbeddings(model="nomic-embed-text")
 
 print(f"Type of splits: {type(splits)}")
 print(f"Number of documents: {len(splits)}")
@@ -57,7 +57,7 @@ rag_prompt = ChatPromptTemplate.from_template(
 # 5. Build the LCEL RAG Chain
 rag_chain = (
     RunnableParallel({
-        "context": retriever | format_docs, # <-- Now this works!
+        "context": retriever | format_docs,
         "question": RunnablePassthrough(),
     })
     | rag_prompt
