@@ -9,16 +9,20 @@ from ragas import evaluate
 from ragas.llms import LangchainLLMWrapper
 from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
-from langchain_core.runnables import RunnablePassthrough, \
-    RunnableParallel  # <---  RunnableParallel is imported
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from ragas.metrics import (
-    # Corrected RAGAS Metric Imports
     faithfulness, answer_relevancy, context_precision, context_recall,
     context_entity_recall, answer_correctness
 )
 
 # 1. Configure the RAGAS Judge LLM
-EVAL_LLM = LangchainLLMWrapper(ChatOllama(model="tinydolphin"))
+# Change the model here to the smallest one that works (e.g., 'tinydolphin')
+EVAL_LLM = LangchainLLMWrapper(
+    ChatOllama(model="llama2"),
+    # 💥 FIX: Limit the number of concurrent asynchronous jobs (default is 10)
+    # Setting this to 1 forces sequential evaluation, preventing resource contention and timeouts.
+    async_executor_limit=1
+)
 EVAL_EMBEDDINGS = OllamaEmbeddings(model="nomic-embed-text")
 
 # 2. Define the metrics for easy access
@@ -30,12 +34,8 @@ ALL_METRICS = {
 
 # 3. Utility function to run the RAG chain and collect data for RAGAS
 def run_rag_chain_for_ragas(question: str, retriever: object, rag_chain: object) -> dict:
-    """
-    Executes the RAG pipeline to get the final answer and the retrieved documents,
-    formatting the output for the RAGAS Dataset object.
-    """
+    """Executes the RAG pipeline to get the final answer and the retrieved documents."""
 
-    # 💥 FIX: Wrap the dictionary in RunnableParallel to make it callable
     full_pipeline = RunnableParallel({
         "context": retriever,
         "answer": rag_chain,
@@ -66,12 +66,9 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
     for item in test_data:
         ragas_output = run_rag_chain_for_ragas(item["question"], retriever, rag_chain)
 
-        # Ragas requires a list for ground_truths
+        # Required columns for RAGAS evaluation
         ragas_output["ground_truths"] = [item["ground_truth"]]
-
-        # ADD THE 'reference' COLUMN
-        # This is mandatory for the 'context_precision' metric in modern RAGAS
-        ragas_output["reference"] = item["ground_truth"]
+        ragas_output["reference"] = item["ground_truth"]  # Mandatory for context_precision
 
         predictions.append(ragas_output)
 
@@ -82,11 +79,8 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
         dataset=ragas_dataset,
         metrics=metrics,
         llm=EVAL_LLM,
-        embeddings=EVAL_EMBEDDINGS,
-        #  Limit the number of workers to 1 to prevent resource contention
-        # This forces sequential processing and prevents timeouts.
-        raise_exceptions=False,  # Optional: prevents the script from crashing immediately
-        workers=1
+        embeddings=EVAL_EMBEDDINGS
+        # NOTE: 'workers' argument removed to fix TypeError
     )
 
     print("\n--- Aggregated Scores ---")
