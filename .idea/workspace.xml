@@ -4,18 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96bce985-87fe-4c47-933f-7e7bb66fc51f" name="Changes" comment="  completed the initial setup and implementation of the Retrieval-Augmented Generation (RAG) pipeline using LangChain Expression Language (LCEL)  this is the system we want to evaluate">
-      <change afterPath="$PROJECT_DIR$/finance_docs/financial_statement.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/finance_docs/full-report-ubs-group-consolidated-2q25.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/finance_docs/ubs_group_performance.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/raga_pipeline.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ragas_evaluation_advance.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ragas_evaluation_generation_module_2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ragas_evaluation_retrieval_module_1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ragas_util.py" afterDir="false" />
+    <list default="true" id="96bce985-87fe-4c47-933f-7e7bb66fc51f" name="Changes" comment=" adding utils, diffeerernt evaluations and financial dataset documents">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/my_document.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ragas_demo1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ragas_evaluation_retrieval_module_1.py" beforeDir="false" afterPath="$PROJECT_DIR$/ragas_evaluation_retrieval_module_1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ragas_util.py" beforeDir="false" afterPath="$PROJECT_DIR$/ragas_util.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,11 +95,20 @@
       <option name="project" value="LOCAL" />
       <updated>1761336216834</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary=" adding utils, diffeerernt evaluations and financial dataset documents">
+      <option name="closed" value="true" />
+      <created>1761399400301</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1761399400301</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="  completed the initial setup and implementation of the Retrieval-Augmented Generation (RAG) pipeline using LangChain Expression Language (LCEL)  this is the system we want to evaluate" />
-    <option name="LAST_COMMIT_MESSAGE" value="  completed the initial setup and implementation of the Retrieval-Augmented Generation (RAG) pipeline using LangChain Expression Language (LCEL)  this is the system we want to evaluate" />
+    <MESSAGE value=" adding utils, diffeerernt evaluations and financial dataset documents" />
+    <option name="LAST_COMMIT_MESSAGE" value=" adding utils, diffeerernt evaluations and financial dataset documents" />
   </component>
 </project>

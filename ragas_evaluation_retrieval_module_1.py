@@ -21,6 +21,7 @@ TEST_DATA_RETRIEVAL = [
 ]
 
 if __name__ == "__main__":
+
     print("\n" + "=" * 70)
     print("      Module 1: RETRIEVAL EVALUATION (Context Focus)")
     print("=" * 70)
@@ -28,5 +29,19 @@ if __name__ == "__main__":
     # Call the utility function to run the entire evaluation
     df = run_evaluation(TEST_DATA_RETRIEVAL, ALL_METRICS["retrieval"])
 
+    print("\n--- Available Columns in Result DataFrame (For Debugging) ---")
+    print(df.columns.tolist())  # <-- NEW: Prints all available columns
+
     print("\n--- Detailed Context Metrics Results ---")
-    print(df[['question', 'context_precision', 'context_recall', 'context_entity_recall']].to_string())
+
+    # Define the core metric columns (these should always be present)
+    display_columns = ['context_precision', 'context_recall', 'context_entity_recall']
+
+    # Only add 'question' to the display list if it exists in the DataFrame
+    if 'question' in df.columns:
+        display_columns.insert(0, 'question')
+    else:
+        print("\n**WARNING**: 'question' column not found. Displaying metrics only.")
+
+    # Display the results
+    print(df[display_columns].to_string())
