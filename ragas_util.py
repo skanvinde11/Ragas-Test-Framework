@@ -3,6 +3,7 @@
 from raga_pipeline import setup_rag_system, create_rag_chain
 import pandas as pd
 from datasets import Dataset
+import time  # 👈 Import the time module
 
 # --- RAGAS and LangChain Imports ---
 from ragas import evaluate
@@ -16,10 +17,10 @@ from ragas.metrics import (
 )
 
 # 1. Configure the RAGAS Judge LLM
-# 💥 FINAL FIX: Set a very long request_timeout (30 minutes = 1800 seconds)
+# Retain the long timeout and fast model to ensure success
 EVAL_LLM = LangchainLLMWrapper(
     ChatOllama(
-        model="tinydolphin",  # Retain the fastest model
+        model="tinydolphin",
         request_timeout=1800  # Set timeout to 30 minutes
     )
 )
@@ -27,10 +28,10 @@ EVAL_EMBEDDINGS = OllamaEmbeddings(model="nomic-embed-text")
 
 # 2. Define the metrics for easy access
 ALL_METRICS = {
-    "retrieval": [#context_precision, #
-        context_recall
-        #, context_entity_recall
-        ],
+    "retrieval": [#context_precision,
+                  context_recall
+                  #context_entity_recall
+                  ],
     "generation": [faithfulness, answer_relevancy, answer_correctness]
 }
 
@@ -54,7 +55,7 @@ def run_rag_chain_for_ragas(question: str, retriever: object, rag_chain: object)
     }
 
 
-# 4. Core evaluation function
+# 4. Core evaluation function (TIMED)
 def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
     """
     Runs the RAG chain on the test data, converts to RAGAS Dataset,
@@ -64,22 +65,33 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
     rag_chain, _ = create_rag_chain(retriever)
 
     predictions = []
+
+    # ----------------------------------------------------
+    # PHASE 1: Data Collection Timing (Running the RAG Chain)
+    # ----------------------------------------------------
+    start_data_collection = time.time()  #  START TIMER
+
     print(f"--- Generating {len(test_data)} predictions for evaluation ---")
 
     for item in test_data:
         ragas_output = run_rag_chain_for_ragas(item["question"], retriever, rag_chain)
-
-        # Required columns for RAGAS evaluation
         ragas_output["ground_truths"] = [item["ground_truth"]]
-        ragas_output["reference"] = item["ground_truth"]  # Mandatory for context_precision
-
+        ragas_output["reference"] = item["ground_truth"]
         predictions.append(ragas_output)
 
     ragas_dataset = Dataset.from_list(predictions)
 
+    end_data_collection = time.time()  # END TIMER
+    duration_data_collection = end_data_collection - start_data_collection
+    print(f"Data Collection Time: {duration_data_collection:.2f} seconds")
+
+    # ----------------------------------------------------
+    # PHASE 2: RAGAS Evaluation Timing (Running the Judge LLM)
+    # ----------------------------------------------------
+    start_evaluation = time.time()  #  START TIMER
+
     print(f"\n--- Starting RAGAS Evaluation with {len(metrics)} metrics ---")
 
-    # The evaluation proceeds sequentially, but each job  has 30 minutes to complete.
     result = evaluate(
         dataset=ragas_dataset,
         metrics=metrics,
@@ -87,7 +99,11 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
         embeddings=EVAL_EMBEDDINGS
     )
 
+    end_evaluation = time.time()  #  END TIMER
+    duration_evaluation = end_evaluation - start_evaluation
+
     print("\n--- Aggregated Scores ---")
     print(result)
+    print(f" **RAGAS Evaluation Time:** {duration_evaluation:.2f} seconds")
 
     return result.to_pandas()
