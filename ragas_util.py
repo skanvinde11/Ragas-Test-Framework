@@ -1,6 +1,6 @@
 # ragas_utils.py
 
-from raga_pipeline import setup_rag_system, create_rag_chain
+from rag_pipeline import setup_rag_system, create_rag_chain
 import pandas as pd
 from datasets import Dataset
 
@@ -16,12 +16,10 @@ from ragas.metrics import (
 )
 
 # 1. Configure the RAGAS Judge LLM
-# Change the model here to the smallest one that works (e.g., 'tinydolphin')
+# 💥 FINAL FIX: Use a very small, fast model to prevent default timeouts
+# Make sure you run 'ollama pull tinydolphin' first!
 EVAL_LLM = LangchainLLMWrapper(
-    ChatOllama(model="llama2"),
-    # 💥 FIX: Limit the number of concurrent asynchronous jobs (default is 10)
-    # Setting this to 1 forces sequential evaluation, preventing resource contention and timeouts.
-    async_executor_limit=1
+    ChatOllama(model="tinydolphin")
 )
 EVAL_EMBEDDINGS = OllamaEmbeddings(model="nomic-embed-text")
 
@@ -80,7 +78,6 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
         metrics=metrics,
         llm=EVAL_LLM,
         embeddings=EVAL_EMBEDDINGS
-        # NOTE: 'workers' argument removed to fix TypeError
     )
 
     print("\n--- Aggregated Scores ---")
