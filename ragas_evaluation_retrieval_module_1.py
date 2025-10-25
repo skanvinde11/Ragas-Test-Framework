@@ -35,7 +35,7 @@ if __name__ == "__main__":
     print("\n--- Detailed Context Metrics Results ---")
 
     # Define the core metric columns (these should always be present)
-    display_columns = ['context_precision', 'context_recall', 'context_entity_recall']
+    display_columns = ['context_recall']
 
     # Only add 'question' to the display list if it exists in the DataFrame
     if 'question' in df.columns:

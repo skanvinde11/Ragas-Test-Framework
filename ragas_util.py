@@ -27,7 +27,10 @@ EVAL_EMBEDDINGS = OllamaEmbeddings(model="nomic-embed-text")
 
 # 2. Define the metrics for easy access
 ALL_METRICS = {
-    "retrieval": [context_precision, context_recall, context_entity_recall],
+    "retrieval": [#context_precision, #
+        context_recall
+        #, context_entity_recall
+        ],
     "generation": [faithfulness, answer_relevancy, answer_correctness]
 }
 
@@ -76,7 +79,7 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
 
     print(f"\n--- Starting RAGAS Evaluation with {len(metrics)} metrics ---")
 
-    # The evaluation proceeds sequentially, but each job now has 30 minutes to complete.
+    # The evaluation proceeds sequentially, but each job  has 30 minutes to complete.
     result = evaluate(
         dataset=ragas_dataset,
         metrics=metrics,
