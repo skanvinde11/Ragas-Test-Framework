@@ -1,6 +1,6 @@
 # ragas_utils.py
 
-from rag_pipeline import setup_rag_system, create_rag_chain
+from raga_pipeline import setup_rag_system, create_rag_chain
 import pandas as pd
 from datasets import Dataset
 
