@@ -1,6 +1,6 @@
 # ragas_utils.py
 
-from raga_pipeline import setup_rag_system, create_rag_chain
+from rag_pipeline import setup_rag_system, create_rag_chain
 import pandas as pd
 from datasets import Dataset
 
@@ -16,10 +16,12 @@ from ragas.metrics import (
 )
 
 # 1. Configure the RAGAS Judge LLM
-# 💥 FINAL FIX: Use a very small, fast model to prevent default timeouts
-# Make sure you run 'ollama pull tinydolphin' first!
+# 💥 FINAL FIX: Set a very long request_timeout (30 minutes = 1800 seconds)
 EVAL_LLM = LangchainLLMWrapper(
-    ChatOllama(model="tinydolphin")
+    ChatOllama(
+        model="tinydolphin",  # Retain the fastest model
+        request_timeout=1800  # Set timeout to 30 minutes
+    )
 )
 EVAL_EMBEDDINGS = OllamaEmbeddings(model="nomic-embed-text")
 
@@ -73,6 +75,8 @@ def run_evaluation(test_data: list, metrics: list) -> pd.DataFrame:
     ragas_dataset = Dataset.from_list(predictions)
 
     print(f"\n--- Starting RAGAS Evaluation with {len(metrics)} metrics ---")
+
+    # The evaluation proceeds sequentially, but each job now has 30 minutes to complete.
     result = evaluate(
         dataset=ragas_dataset,
         metrics=metrics,
